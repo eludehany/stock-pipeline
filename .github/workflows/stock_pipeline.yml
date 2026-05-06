@@ -2,8 +2,8 @@ name: Stock Pipeline
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # بيشتغل كل 30 دقيقة
-  workflow_dispatch:  # بيخليك تشغله يدوي لو عايز
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
 
 jobs:
   run-pipeline:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -19,16 +19,13 @@ jobs:
           python-version: '3.11'
 
       - name: Run Stock Simulator
-        run: python stock_simulator.py &
-        
-      - name: Wait for data
-        run: sleep 30
+        run: timeout 30 python stock_simulator.py || true
 
       - name: Run ETL Pipeline
         run: python etl_pipeline.py
 
       - name: Save results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stock-data
           path: |
